@@ -15,12 +15,12 @@ public class MainActivity extends Activity {
         final ImageView iv = (ImageView)findViewById(R.id.iv);
         String imgUrl = "http://...";
         
-        //for text
+        //for test
         //从网络端下载图片,是否缓存在内存中？是否缓存至某目录下?
         AsyncImageLoader loader = new AsyncImageLoader(getApplicationContext());
         
         //将图片缓存至文件夹下
-        loader.setCacheFile(true);	//false
+        loader.setCache2File(true);	//false
         loader.setCachePath(this.getCacheDir().getAbsolutePath());
         
         loader.downloadImage(iv, imgUrl, true/*false*/, new AsyncImageLoader.ImageCallback() {
@@ -33,5 +33,11 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+    }
+    
+    @Override
+    public void onDestroy(){
+    	super.onDestroy();
+    	AsyncImageLoader.stopThreadPool();
     }
 }

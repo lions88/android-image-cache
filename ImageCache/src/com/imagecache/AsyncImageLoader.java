@@ -24,7 +24,7 @@ public class AsyncImageLoader {
 	private static  HashSet<String> sDownloadingSet;
 	private static Map<String,SoftReference<Bitmap>> sImageCache; 
 	private static ImageManager mManager;
-	private static ExecutorService sThreadPool;
+	private static ExecutorService sExecutorService;
 	private static Handler sHandler; 
 	
 	/**
@@ -37,31 +37,37 @@ public class AsyncImageLoader {
 	static{
 		sDownloadingSet = new HashSet<String>();
 		sImageCache = new HashMap<String,SoftReference<Bitmap>>();
-		sThreadPool = Executors.newFixedThreadPool(5);
 		sHandler = new Handler();
 	}
 
 	public AsyncImageLoader(Context context){
+		startThreadPoolIfNecessary();
 		mManager = new ImageManager(context, sImageCache);
 	}
 	
 	/**
 	 * 是否缓存图片至/data/data/package/cache/目录
 	 */
-	public void setCacheFile(boolean flag){
-		mManager.setCacheFile(flag);
+	public void setCache2File(boolean flag){
+		mManager.setCache2File(flag);
 	}
 	
 	//设置缓存路径，默认为cache目录
 	public void setCachePath(String cacheDir){
 		mManager.setCachePath(cacheDir);
 	}
-	
+
+	//开启线程池
+	public static void startThreadPoolIfNecessary(){
+		if(sExecutorService == null || sExecutorService.isShutdown() || sExecutorService.isTerminated()){
+			sExecutorService = Executors.newFixedThreadPool(5);
+		}
+	}
 	//关闭线程池
-	/*public static void shutDownThreadPool(){
-		if( !sThreadPool.isShutdown() )
-			sThreadPool.shutdown();
-	}*/
+	public static void stopThreadPool(){
+		if( !sExecutorService.isShutdown() || !sExecutorService.isTerminated() )
+			sExecutorService.shutdownNow();
+	}
 	
 	/**
 	 * 异步下载图片
@@ -86,7 +92,7 @@ public class AsyncImageLoader {
 		}else{
 			//从网络端下载图片
 			sDownloadingSet.add(url);
-			sThreadPool.submit(new Runnable(){
+			sExecutorService.submit(new Runnable(){
 				@Override
 				public void run() {
 					final Bitmap bitmap = mManager.getBitmapFromUrl(url, cache2Memory);

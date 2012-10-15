@@ -24,7 +24,7 @@ public class ImageManager {
 	private Map<String, SoftReference<Bitmap>> imageCache;
 	
 	//是否缓存图片至本地文件
-	private boolean cacheFileFlag = false;
+	private boolean cache2FileFlag = false;
 	
 	//缓存目录,默认是/data/data/package/cache/目录
 	private String cacheDir;
@@ -55,7 +55,7 @@ public class ImageManager {
 	 * @return bitmap
 	 * @throws IOException
 	 */
-	public Bitmap getBitmapFromUrl(String url, boolean cacheMemory){
+	public Bitmap getBitmapFromUrl(String url, boolean cache2Memory){
 		Bitmap bitmap = null;
 		try{
 			URL u = new URL(url);
@@ -63,10 +63,10 @@ public class ImageManager {
 			InputStream is = conn.getInputStream();
 			bitmap = BitmapFactory.decodeStream(is);
 			
-			if(cacheMemory){
+			if(cache2Memory){
 				//1.缓存bitmap至内存软引用中
 				imageCache.put(url, new SoftReference<Bitmap>(bitmap));
-				if(cacheFileFlag){
+				if(cache2FileFlag){
 					//2.缓存bitmap至/data/data/packageName/cache/文件夹中
 					String fileName = Md5Util.getMD5Str(url);
 					String filePath = this.cacheDir + "/" +fileName;
@@ -88,8 +88,8 @@ public class ImageManager {
 	 * 设置是否缓存图片至本地文件夹
 	 * @param flag
 	 */
-	public void setCacheFile(boolean flag){
-		cacheFileFlag = flag;
+	public void setCache2File(boolean flag){
+		cache2FileFlag = flag;
 	}
 
 	
@@ -111,7 +111,7 @@ public class ImageManager {
 			}
 		}
 		//从cache文件夹中获取
-		if(cacheFileFlag){
+		if(cache2FileFlag){
 			bitmap = getBitmapFromCacheDir(url);
 			if(bitmap != null)
 				imageCache.put(url, new SoftReference<Bitmap>(bitmap));
